@@ -25,15 +25,15 @@ object List{
   }
 
   def tail[A](ls:List[A]):List[A] = ls match{
-    case Nil =>  throw new IllegalStateException()
+    case Nil =>  sys.error("List does not have enough elements to get tail")
     case Cons(_, tail) => tail
   }
   def setHead[A](head:A, ls:List[A]):List[A] = ls match{
-    case Nil =>  throw new IllegalStateException()
+    case Nil =>  sys.error("Empty list and cannot replace Head")
     case Cons(_, tail) => Cons(head, tail)
   }
   def drop[A](ls:List[A], n:Int):List[A] = ls match{
-    case Nil =>  throw new IllegalStateException()
+    case Nil =>  throw sys.error("List is smaller than n and cannot drop n elements")
     case Cons(_, tail) => drop(tail, n-1)
   }
   def dropWhile[A](ls:List[A], p:A=>Boolean):List[A] = ls match{
@@ -41,7 +41,7 @@ object List{
     case Cons(head, tail) => if(p(head)) dropWhile(tail, p) else Cons(head, dropWhile(tail, p))
   }
   def init[A](ls:List[A]):List[A] = ls match{
-    case Nil=>throw new IllegalStateException()
+    case Nil=>throw sys.error("Cannot do init on an empty list")
     case Cons(head, Nil) => Nil
     case Cons(head, tail) => Cons(head, init(tail))
   }
