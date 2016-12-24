@@ -1,5 +1,7 @@
 package chap3
 
+import scala.annotation.tailrec
+
 /**
   * Created by bcarlson on 10/24/16.
   */
@@ -10,6 +12,11 @@ case class Cons[+A](head:A, tail:List[A]) extends List[A]
 
 
 object List{
+
+  def length[A](ls:List[A]):Int = {
+    List.foldRight(ls, 0)((_, y)=>y+1)
+  }
+
   def sum(ints:List[Int]):Int=ints match {
     case Nil => 0
     case Cons(head, tail) => head + sum(tail)
@@ -52,6 +59,33 @@ object List{
     case Nil=> z
     case Cons(head, tail) => f(head, foldRight(tail, z)(f))
   }
+
+  def sumWFoldRight(ls:List[Int]):Int={
+    List.foldRight(ls, 0)( _+_ )
+  }
+
+  def prodWFoldRight(ls:List[Int]):Int={
+    List.foldRight(ls, 1)( _*_ )
+  }
+
+  @tailrec
+  def foldLeft[A,B](as: List[A], z: B)(f: (B,A) => B): B= as match {
+    case Nil => z
+    case Cons(x, xs)=>foldLeft(xs, f(z,x))(f)
+  }
+
+  def sumWFoldLeft(ls:List[Int]):Int={
+    List.foldLeft(ls, 0)( _+_ )
+  }
+
+  def prodWFoldLeft(ls:List[Int]):Int={
+    List.foldLeft(ls, 1)( _*_ )
+  }
+
+
+
+
+
 
 }
 
