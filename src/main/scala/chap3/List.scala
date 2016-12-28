@@ -28,6 +28,9 @@ object List {
   }
 
 
+  def doubleToString(ds:List[Double]):List[String]=
+    foldRight(ds, Nil:List[String])((h,t)=>Cons(h.toString, t))
+
   def foldRightViaFoldLeft[A, B](ls: List[A], z: B)(f: (A, B) => B): B = {
     List.foldLeft(List.reverse(ls), z)((b, a) => f(a, b))
   }
