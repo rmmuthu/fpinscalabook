@@ -1,51 +1,125 @@
 package chap3
 
+import scala.annotation.tailrec
+
 /**
-  * Created by bcarlson on 10/24/16.
+  * Created by bcarlson on 12/21/16.
   */
+
 sealed trait List[+A]
-
 case object Nil extends List[Nothing]
-case class Cons[+A](head:A, tail:List[A]) extends List[A]
+case class Cons[+A](head:A, tail: List[A]) extends List[A]
 
+object List {
 
-object List{
-  def sum(ints:List[Int]):Int=ints match {
-    case Nil => 0
-    case Cons(head, tail) => head + sum(tail)
-  }
-  def product(ints:List[Int]):Int=ints match {
-    case Nil => 0
-    case Cons(head, tail) => head * product(tail)
+  def foldRight[A, B](ls: List[A], z: B)(f: (A, B) => B): B = ls match {
+    case Nil => z
+    case Cons(x, xs) => f(x, foldRight(xs, z)(f))
   }
 
-  def apply[A](args:A*):List[A] = {
-    if(args.isEmpty) Nil
-    else Cons(args.head, apply(args.tail:_*))
+  @tailrec
+  def foldLeft[A, B](ls: List[A], z: B)(f: (B, A) => B): B = ls match {
+    case Nil => z
+    case Cons(x, xs) => foldLeft(xs, f(z, x))(f)
   }
 
-  def tail[A](ls:List[A]):List[A] = ls match{
-    case Nil =>  sys.error("List does not have enough elements to get tail")
+  def add1(ls: List[Int]): List[Int] = {
+    foldRight(ls, Nil: List[Int])((h, t) => Cons(h + 1, t))
+  }
+
+
+  def foldRightViaFoldLeft[A, B](ls: List[A], z: B)(f: (A, B) => B): B = {
+    List.foldLeft(List.reverse(ls), z)((b, a) => f(a, b))
+  }
+
+  def foldRightViaFoldLeft_1[A, B](ls: List[A], z: B)(f: (A, B) => B): B = {
+    foldLeft(ls, (b: B) => b)((g: B => B, a: A) => b => g(f(a, b)))(z)
+  }
+
+
+  def foldLeftViaFoldRight_1[A, B](ls: List[A], z: B)(f: (B, A) => B): B = {
+    foldRight(ls, (b: B) => b)((a: A, g: B => B) => b => g(f(b, a)))(z)
+  }
+
+
+  def foldLeft2[A, B](ls: List[A], z: B)(f: (A, B) => B): B = ls match {
+    case Nil => z
+    case Cons(x, xs) => foldLeft2(xs, f(x, z))(f)
+  }
+
+  def reverse[A](ls: List[A]): List[A] = {
+    List.foldLeft(ls, Nil: List[A])((y: List[A], x: A) => Cons(x, y))
+  }
+
+  def init[A](ls: List[A]): List[A] = ls match {
+    case Nil => throw sys.error("Not enough items")
+    case Cons(_, Nil) => Nil
+    case Cons(head, tail) => Cons(head, init(tail))
+
+
+  }
+
+
+  def append[A](a1: List[A], a2: List[A]): List[A] = a1 match {
+    case Nil => a2
+    case Cons(x, xs) => Cons(x, append(xs, a2))
+  }
+
+  def appendViaFold[A](ls1: List[A], ls2: List[A]): List[A] = {
+    foldRight(ls1, ls2)((x: A, xs: List[A]) => Cons(x, xs))
+  }
+
+  def concat[A](ls: List[List[A]]): List[A] = {
+    foldLeft(ls, Nil: List[A])(append)
+  }
+
+  def setHead[A](ls: List[A], head: A): List[A] = ls match {
+    case Nil => Cons(head, Nil)
+    case Cons(_, _) => Cons(head, ls)
+  }
+
+
+  def tail[A](ls: List[A]): List[A] = ls match {
+    case Nil => throw sys.error("Cannot get the tail of an empty list")
     case Cons(_, tail) => tail
   }
-  def setHead[A](head:A, ls:List[A]):List[A] = ls match{
-    case Nil =>  sys.error("Empty list and cannot replace Head")
-    case Cons(_, tail) => Cons(head, tail)
-  }
-  def drop[A](ls:List[A], n:Int):List[A] = ls match{
-    case Nil =>  throw sys.error("List is smaller than n and cannot drop n elements")
-    case Cons(_, tail) => drop(tail, n-1)
-  }
-  def dropWhile[A](ls:List[A], p:A=>Boolean):List[A] = ls match{
-    case Nil =>  Nil
-    case Cons(head, tail) => if(p(head)) dropWhile(tail, p) else Cons(head, dropWhile(tail, p))
-  }
-  def init[A](ls:List[A]):List[A] = ls match{
-    case Nil=>throw sys.error("Cannot do init on an empty list")
-    case Cons(head, Nil) => Nil
-    case Cons(head, tail) => Cons(head, init(tail))
+
+  def drop[A](ls: List[A], n: Int): List[A] = ls match {
+    case Nil => throw sys.error("Not as many to drop ")
+    case Cons(_, tail) => if (n > 0) drop(tail, n - 1) else ls
   }
 
+  def dropWhile[A](ls: List[A], f: A => Boolean): List[A] = ls match {
+    case Nil => Nil
+    case Cons(head, tail) => if (f(head)) dropWhile(tail, f) else Cons(head, dropWhile(tail, f))
+  }
+
+  def apply[A](ls: A*): List[A] =
+    if (ls.isEmpty) Nil
+    else Cons(ls.head, apply(ls.tail: _*))
+
+
+  def combine[A](ls: List[A], zero: A, f: (A, A) => A): A = ls match {
+    case Nil => zero
+    case Cons(head, tail) => f(head, combine(tail, zero, f))
+  }
+
+  def add: (Int, Int) => Int = (x: Int, y: Int) => x + y
+
+  def prod: (Int, Int) => Int = (x: Int, y: Int) => x * y
+
+  def sum(ls: List[Int]): Int = {
+    combine(ls, 0, add)
+  }
+
+  def product(ls: List[Int]): Int = {
+    combine(ls, 0, prod)
+  }
+
+  def concatString: (String, String) => String = (x: String, y: String) => x.concat(y)
+
+
+  def length[A](ls: List[A]): Int = {
+    foldRight(ls, 0)((_, acc: Int) => acc + 1)
+  }
 }
-
-
