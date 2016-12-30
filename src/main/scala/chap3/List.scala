@@ -12,6 +12,21 @@ case class Cons[+A](head:A, tail: List[A]) extends List[A]
 
 object List {
 
+
+
+  def zipWith[A,B,C](ls:List[A], ls2:List[B], f:(A,B)=>C):List[C]= (ls, ls2) match{
+    case (_, Nil) => Nil
+    case (Nil, _) => Nil
+    case (Cons(h1,t1),Cons(h2,t2)) => Cons(f(h1,h2), zipWith(t1,t2,f))
+  }
+
+
+  def zip(ls:List[Int], ls2:List[Int]):List[Int]= (ls, ls2) match{
+    case (_, Nil) => Nil
+    case (Nil, _) => Nil
+    case (Cons(h1,t1),Cons(h2,t2)) => Cons(h1+h2, zip(t1,t2))
+  }
+
   def foldRight[A, B](ls: List[A], z: B)(f: (A, B) => B): B = ls match {
     case Nil => z
     case Cons(x, xs) => f(x, foldRight(xs, z)(f))
