@@ -31,6 +31,16 @@ object List {
   def doubleToString(ds:List[Double]):List[String]=
     foldRight(ds, Nil:List[String])((h,t)=>Cons(h.toString, t))
 
+  def map[A,B](ls:List[A], f:A=>B):List[B]={
+    List.foldRight(ls, Nil:List[B])((x,xs)=>Cons(f(x), xs))
+  }
+  def filter[A](as: List[A])(f: A => Boolean): List[A]={
+    foldRight(as, Nil:List[A])((x,xs)=>if(f(x))Cons(x,xs)else xs)
+  }
+
+
+
+
   def foldRightViaFoldLeft[A, B](ls: List[A], z: B)(f: (A, B) => B): B = {
     List.foldLeft(List.reverse(ls), z)((b, a) => f(a, b))
   }
@@ -124,5 +134,12 @@ object List {
 
   def length[A](ls: List[A]): Int = {
     foldRight(ls, 0)((_, acc: Int) => acc + 1)
+  }
+
+  def hasSubsequence[A](sup:List[A], sub:List[A]):Boolean = (sup, sub) match {
+    case (Nil, Nil)=> true
+    case (Nil, _) => false
+    case (_, Nil) => true
+    case (Cons(h1, t1), Cons(h2, t2)) => if (h1 == h2) hasSubsequence(t1, t2) else hasSubsequence(t1, sub)
   }
 }
