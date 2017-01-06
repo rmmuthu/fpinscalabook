@@ -41,5 +41,14 @@ object Tree{
   def maxWFold(t:Tree[Int]):Int={
     fold(t)(x=>x)((x:Int,y:Int)=>x.max(y))
   }
+  def maxDepthWFold[A](t:Tree[A]):Int={
+    fold(t)(_=>1)((x,y)=>1+(x max y))
+  }
+
+
+  def mapWithFold[A,B](t:Tree[A])(f:A=>B):Tree[B]={
+    fold(t)(x=>Leaf(f(x)):Tree[B])((x:Tree[B],y:Tree[B])=>Branch(x,y))
+  }
+
 
 }
