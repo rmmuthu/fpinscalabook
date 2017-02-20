@@ -1,4 +1,4 @@
-import chap4._
+import errorhandling._
 def Try[A](a: => A )={
   try Right(a)
   catch{ case e:Exception => Left(e) }

@@ -1,4 +1,4 @@
-package chap3
+package datastructures
 
 /**
   * Created by bcarlson on 1/3/17.

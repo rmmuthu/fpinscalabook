@@ -1,4 +1,4 @@
-package chap3
+package datastructures
 
 import org.scalatest.{FlatSpec, FunSuite, Matchers}
 import org.scalatest.junit.{JUnitRunner, JUnitSuite}

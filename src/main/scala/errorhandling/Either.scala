@@ -1,4 +1,4 @@
-package chap4
+package errorhandling
 
 /**
   * Created by bcarlson on 1/31/17.

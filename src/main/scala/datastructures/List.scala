@@ -1,4 +1,4 @@
-package chap3
+package datastructures
 
 import scala.annotation.tailrec
 

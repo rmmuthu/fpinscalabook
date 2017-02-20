@@ -1,4 +1,4 @@
-import chap4._
+import errorhandling._
 
 case class Person(name: Name, age: Age)
 sealed class Name(val value: String)
