@@ -20,8 +20,8 @@ def flatMap[A,B](as: List[A])(f: A => List[B]): List[B]={
 }
 
 flatMap(v1)(i => List(i,i))
-
-
+"aaa"
+List.hasSubsequence(List(1,2,3), List(1,3))
 
 
 

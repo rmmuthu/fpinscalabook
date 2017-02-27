@@ -8,16 +8,43 @@ import laziness._
 //z.take(2).toList
 //z.take(3).toList
 //
+//
+//Stream.cons({println("1");1}, Stream.cons({println("2");2}, Stream.cons({println("3");3}, Stream.empty))).takeWithFold(3).toList
+//Stream.cons({println("1");1}, Stream.cons({println("2");2}, Stream.cons({println("3");3}, Stream.empty))).takeWhileWithFold(_<3).toList
+//
+//Stream.constant(22).take(2).toList
+//Stream.constantWFold(22).take(2).toList
+//
+//Stream.from(55).take(5).toList
+//
+//Stream.fromUnfold(55).take(5).toList
 
-Stream.cons({println("1");1}, Stream.cons({println("2");2}, Stream.cons({println("3");3}, Stream.empty))).takeWithFold(3).toList
-Stream.cons({println("1");1}, Stream.cons({println("2");2}, Stream.cons({println("3");3}, Stream.empty))).takeWhileWithFold(_<3).toList
+List(1).zipAll(List("a","b","c","d"),4,"e")
+val s1 = Stream.cons({println("1");1}, Stream.cons({println("2");2}, Stream.cons({println("3");3}, Stream.empty)))
+val s2 = Stream.cons({println("a");"A"},Stream.cons({println("b");"B"},Stream.cons({println("c");"C"},Stream.cons({println("d");"D"},  Stream.empty))))
+val s3 = Stream.cons({println("b");"B"},Stream.cons({println("c");"C"},Stream.cons({println("d");"D"},  Stream.empty)))
+val s4 = Stream.cons({println("b");"B"},Stream.cons({println("c");"C"},  Stream.empty))
+val s5 =   Stream.empty
+val s6 = Stream.cons({println("a");"A"}, Stream.empty)
+val s7 = Stream.cons({println("a");"A"},Stream.cons({println("c");"C"},  Stream.empty))
 
-Stream.constant(22).take(2).toList
-Stream.constantWFold(22).take(2).toList
+s1.tails.toList
 
-Stream.from(55).take(5).toList
+s1.drop(1).toList
 
-Stream.fromUnfold(55).take(5).toList
+
+//tails(s1)
+
+s2.hasSubsequence(s3)
+s2.hasSubsequence(s4)
+s2.hasSubsequence(s5)
+s2.hasSubsequence(s6)
+s2.hasSubsequence(s1)
+s2.hasSubsequence(s7)
+
+s1.zipAll(s2).toList
+
+
 
 //
 //val z = Stream({println("1+1");1+1},

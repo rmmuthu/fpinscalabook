@@ -9,96 +9,146 @@ import scala.annotation.tailrec
   * Created by bcarlson on 2/6/17.
   */
 trait Stream[+A] {
-  def headOption: Option[A] = this match {
-    case Empty => None
-    case Cons(x, _) => Some(x())
+  def headOption:Option[A]=this match {
+    case Empty=>None
+    case Cons(h, _)=>Some(h())
   }
 
-  def toList: List[A] = {
-    @tailrec
-    def go(tmp: Stream[A], acc: List[A]): List[A] = tmp match {
-      case Empty => acc
-      case Cons(x, xs) => go(xs(), x() :: acc)
-    }
 
+  def toList:List[A]={
+    @tailrec
+    def go(s:Stream[A], acc:List[A]):List[A]=s  match{
+      case Empty=>acc
+      case Cons(h, t)=>go(t(), h()::acc)
+    }
     go(this, List()).reverse
   }
 
-//  def take(n: Int): Stream[A] = this match {
-//    case Cons(h, t) if n>0 => cons[A](h(), t().take(n-1))
-//    case _ => empty
-//  }
 
-  def take(n: Int): Stream[A] = this match {
-    case Cons(h, t) if n>0 => cons(h(), t().take(n-1))
-    case _ => empty
+  def take(n:Int):Stream[A]=this match{
+    case Cons(h, t) if n>0=>cons(h(), t().take(n-1))
+    case _=>Empty
   }
+
+  def takeWhile(p:A=>Boolean):Stream[A]=this match{
+    case Cons(h, t) if p(h())  =>cons(h(), t().takeWhile(p))
+    case _=>Empty
+  }
+  @tailrec
+  final def foldLeft[B](z: =>B)(f:(A,=>B)=>B):B={println("Left "+z);this match {
+    case Cons(h, t) => t().foldLeft(f(h(), z))(f)
+    case _ => z
+  }
+  }
+  def foldRight[B](z: =>B)(f:(A,=>B)=>B):B= {
+    println("Right " + z)
+    this match {
+      case Cons(h, t) => f(h(), t().foldRight(z)(f))
+      case _ => z
+    }
+  }
+  def forAll(p: A => Boolean): Boolean=foldRight(true)((a,b)=>p(a)&&b)
+
+  def exists(p: A => Boolean): Boolean = this match {
+    case Cons(h, t) => p(h()) || t().exists(p)
+    case _ => false
+  }
+
+  @tailrec
+  final def drop(n:Int):Stream[A]=this match{
+    case Cons(_, t) if n>0  => t().drop(n-1)
+    case _ => this
+  }
+
+
   def takeWithFold(n: Int): Stream[A] = unfold(this) {
-    case Cons(h, t) if n>0 => Some(h(), t())
+    case Cons(h, t) if n > 0 => Some(h(), t())
     case _ => None
   }
-  def takeWhile(p: A=>Boolean): Stream[A] = this match {
-    case Cons(h, t) if p(h()) => cons(h(), t().takeWhile(p))
-    case _ => empty
-  }
-  def takeWhileWithFold(p: A=>Boolean): Stream[A] = unfold(this) {
+
+
+  def takeWhileWithFold(p: A => Boolean): Stream[A] = unfold(this) {
     case Cons(h, t) if p(h()) => Some(h(), t())
     case _ => None
   }
-  @tailrec
-  final def drop(n:Int):Stream[A]=this match{
-    case Cons(_, t) if n>0 => t().drop(n-1)
-    case _ => this
-  }
-  def exists(p:A=>Boolean):Boolean = this match{
-    case Cons(h,t) => if (p(h())) {println("true");true} else {println("false");t().exists(p)}
-    case Empty => false
 
-  }
-  def zipWith[B,C](s2: Stream[B])(f: (A,B) => C): Stream[C] =unfold((this, s2)){
-    case(Cons(h,t), Cons(h2,t2))=> Some(f(h(), h2()), (t(), t2()))
+
+  def zipWith[B, C](s2: Stream[B])(f: (A, B) => C): Stream[C] = unfold((this, s2)) {
+    case (Cons(h, t), Cons(h2, t2)) => Some(f(h(), h2()), (t(), t2()))
     case _ => None
   }
-  def foldRight[B](z: =>B)(f:(A, =>B)=>B):B= this match{
-    case Empty => z
-    case Cons(h, t)=> f( h(), t().foldRight(z)(f))
-  }
-  def existsWFoldRight(p:A=>Boolean):Boolean= {
-    foldRight(false)((a,b)=> {println("predicate check");p(a)} || {println("zero val");b})
-  }
-  def forAll(p:A => Boolean):Boolean=this match{
-    case Cons(h,t)=> if(!p(h())) {println("ending");false} else {println("going"); t().forAll(p)}
-    case _ => true
-  }
-  def takeWhileWFoldRight(p: A=>Boolean): Stream[A] = foldRight(empty:Stream[A])((a,b)=>if(p(a)) cons(a, b) else b)
-  def headOptionWFoldRight: Option[A] = foldRight(None:Option[A])((a,_)=>Some(a))
 
-  def map[B](f:A=>B):Stream[B]=this match{
-    case Empty=>Stream.empty
-    case Cons(h, t)=> cons(f(h()), t().map(f))
+  def zipAll[B](s2: Stream[B]): Stream[(Option[A], Option[B])] = unfold(this, s2) {
+    case (Cons(h, t), Cons(h2, t2)) => Some((Some(h()), Some(h2())), (t(), t2()))
+    case _ => None
   }
-  def mapWithUnfold[B](f:A=>B):Stream[B]={
-    unfold(this){
-      case Cons(h,t)=>Some(f(h()), t())
+
+
+
+  def existsWFoldRight(p: A => Boolean): Boolean = {
+    foldRight(false)((a, b) => {
+      println("predicate check")
+      p(a)
+    } || {
+      println("zero val")
+      b
+    })
+  }
+
+
+  def takeWhileWFoldRight(p: A => Boolean): Stream[A] = foldRight(empty: Stream[A])((a, b) => if (p(a)) cons(a, b) else b)
+
+  def headOptionWFoldRight: Option[A] = foldRight(None: Option[A])((a, _) => Some(a))
+
+  def map[B](f: A => B): Stream[B] = this match {
+    case Empty => Stream.empty
+    case Cons(h, t) => cons(f(h()), t().map(f))
+  }
+
+  def mapWithUnfold[B](f: A => B): Stream[B] = {
+    unfold(this) {
+      case Cons(h, t) => Some(f(h()), t())
       case Empty => None
     }
   }
-  def filter(p:A=>Boolean):Stream[A]=this match{
-    case Empty=>empty
-    case Cons(h,t)=>if(p(h())) cons(h(), t().filter(p)) else t().filter(p)
+
+  def filter(p: A => Boolean): Stream[A] = this match {
+    case Empty => empty
+    case Cons(h, t) => if (p(h())) cons(h(), t().filter(p)) else t().filter(p)
   }
 
-  def mapWFoldRight[B](f:A=>B):Stream[B]={
-    foldRight(empty:Stream[B])((a,b)=>cons(f(a),b))
+  def mapWFoldRight[B](f: A => B): Stream[B] = {
+    foldRight(empty: Stream[B])((a, b) => cons(f(a), b))
   }
-  def filterWFoldRight(p:A=>Boolean):Stream[A]=foldRight(empty:Stream[A])((a,b)=>if(p(a)) cons(a,b)else b)
 
-  def append[B>:A](that: =>Stream[B]):Stream[B]=that match{
-    case Empty=>this
-    case Cons(h, t)=>cons(h(), append(t()))
+  def filterWFoldRight(p: A => Boolean): Stream[A] = foldRight(empty: Stream[A])((a, b) => if (p(a)) cons(a, b) else b)
+
+  def append[B >: A](that: => Stream[B]): Stream[B] = that match {
+    case Empty => this
+    case Cons(h, t) => cons(h(), append(t()))
   }
-  def appendWFoldRight[B>:A](that: =>Stream[B]):Stream[B]=foldRight(that)((h,t)=>cons(h, t))
-  def flatMap[B](f:A=>Stream[B]):Stream[B]=foldRight(empty:Stream[B])((a,b)=>f(a) append b)
+
+  def appendWFoldRight[B >: A](that: => Stream[B]): Stream[B] = foldRight(that)((h, t) => cons(h, t))
+
+  def flatMap[B](f: A => Stream[B]): Stream[B] = foldRight(empty: Stream[B])((a, b) => f(a) append b)
+
+  def startsWith[A](sub: => Stream[A]): Boolean = (this, sub) match {
+    case (_, Empty) => true
+    case (Cons(h, t), Cons(h2, t2)) if h() == h2() => t().startsWith(t2())
+    case _ => false
+  }
+
+  def tails:Stream[Stream[A]]=
+    Stream.unfold(this){
+      case Empty=>None
+      case s=> Some( s, s.drop(1))
+    } append Stream.empty
+
+  def hasSubsequence[A](sub: => Stream[A]): Boolean = (this) match {
+    case (Empty) => sub == Empty
+    case _ if (startsWith(sub)) => true
+    case (Cons(h, t)) => t().hasSubsequence(sub)
+  }
 }
 
 case object Empty extends Stream[Nothing]

@@ -151,10 +151,16 @@ object List {
     foldRight(ls, 0)((_, acc: Int) => acc + 1)
   }
 
-  def hasSubsequence[A](sup:List[A], sub:List[A]):Boolean = (sup, sub) match {
-    case (Nil, Nil)=> true
-    case (Nil, _) => false
-    case (_, Nil) => true
-    case (Cons(h1, t1), Cons(h2, t2)) => if (h1 == h2) hasSubsequence(t1, t2) else hasSubsequence(t1, sub)
+  @tailrec
+  def startsWith[A](l:List[A], prefix:List[A]):Boolean=(l,prefix) match{
+    case (_,Nil)=>true
+    case(Cons(h1,t1), Cons(h2,t2)) if(h1==h2) => startsWith(t1,t2)
+    case _ =>false
+  }
+
+  def hasSubsequence[A](sup:List[A], sub:List[A]):Boolean = (sup) match {
+    case (Nil)=> sub==Nil
+    case _ if(startsWith(sup, sub)) => true
+    case Cons(h1, t1)=> hasSubsequence(t1, sub)
   }
 }
