@@ -18,7 +18,7 @@ trait Generator[+T] {
 object Generator{
   val integers = new Generator[Int] {
     val rand = new java.util.Random
-    override def generate = rand.nextInt()
+    override def generate = {val z = rand.nextInt(); println("#"+z);z}
   }
 
 

@@ -1,19 +1,19 @@
-import coursera._
-
-val integers = new Generator[Int] {
-  val rand = new java.util.Random
-
-  override def generate = rand.nextInt()
-}
+import coursera.Generator._
 
 
-val booleans = new Generator[Boolean] {
-  override def generate = integers.generate >0
-}
 
-val pairs = new Generator[(Int, Int)] {
-  override def generate = (integers.generate, integers.generate)
-}
+
+single(22)
+
+pairs
+
+//val booleans = new Generator[Boolean] {
+//  override def generate = integers.generate >0
+//}
+//
+//val pairs = new Generator[(Int, Int)] {
+//  override def generate = (integers.generate, integers.generate)
+//}
 
 //val booleans2 = for(x<-integers) yield x>0
 //def pairs2[T,U](t: Generator[T], u:Generator[U])=for{
