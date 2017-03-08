@@ -1,16 +1,22 @@
 import coursera.tree.Tree
 
-(Tree("B","C") combine Tree("X")).thisValue
-Tree("B","C","A")
-Tree("B","C","A","D")
-Tree("C","A","Z","B","D")
+val t1 = Tree("B","C") combine Tree("X")
+t1.thisValue
+val t2 = Tree("B","C","A")
+t2.thisValue
 
+val t3 = Tree("B","C","A","D")
+t3.thisValue
+val t4 = Tree("C","A","Z","B","D")
+t4.thisValue
 
-(Tree("C","A","Z","M","D") combine Tree("X","U","B"))
+val t5 = Tree("C","A","Z","M","D") combine Tree("X","U","B")
+t5.thisValue
+val t6 = Tree("C","A","Z","M","D") combine Tree("X","U","B")
+t6.thisValue
+val t7 = Tree("B","D","H", "P", "Y", "C","M", "G","Q","K")
+t7.thisValue
 
-(Tree("C","A","Z","M","D") combine Tree("X","U","B")).thisValue
-
-Tree("B","D","H", "P", "Y", "C","M", "G","Q","K").thisValue
-case class Num(val x:Int, val y:Int){
-  def add(a:Int)(b:Int):Num = Num(a+b+x+y,0)
-}
+val t8 = Tree( "K", "G","Q","C","M", "B","D","H", "P", "Y")
+t8.thisValue
+t8.out

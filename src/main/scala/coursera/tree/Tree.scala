@@ -10,6 +10,7 @@ sealed trait Tree[+A] {
   def add[B >: A](b:B)(implicit ord: Ordering[B]):Tree[B]
   def combine[B >: A](b:Tree[B])(implicit ord: Ordering[B]): Tree[B]
   def thisValue:A
+  def out:String=""
 }
 
 
@@ -20,9 +21,9 @@ case object Empty extends Tree[Nothing] {
   def add[A](a:A)(implicit ord: Ordering[A]):Tree[A]=Node(Empty, Empty, a)
   override def combine[A](t:Tree[A])(implicit ord: Ordering[A]): Tree[A] = t
   override def toString=""
-  override def thisValue=sys.error("Cannot get node value for Empty")
+  override def thisValue:Nothing=sys.error("Cannot get node value for Empty")
 }
-case class Node[+A](val l:Tree[A], val r:Tree[A], val value:A) extends Tree[A] {
+case class Node[+A](l:Tree[A], r:Tree[A], value:A) extends Tree[A] {
   override def isEmpty: Boolean = false
   override def left:Tree[A] = l
   override def right:Tree[A] = r
@@ -33,9 +34,12 @@ case class Node[+A](val l:Tree[A], val r:Tree[A], val value:A) extends Tree[A] {
     else { /*println( thisValue + "not less than "+b);*/Node(l add b, r, thisValue)}
   }
   override def combine[B >: A](b:Tree[B])(implicit ord: Ordering[B]): Tree[B]=
-    b combine left combine right add thisValue
+    (left:Tree[B]) combine right combine b add thisValue
 
-  override def toString="("+left.toString+"."+thisValue+"."+right.toString+")"
+  override def toString:String="("+left.toString+"."+thisValue+"."+right.toString+")"
+
+  override def out:String = thisValue+left.out+right.out
+
 }
 
 object Tree{
