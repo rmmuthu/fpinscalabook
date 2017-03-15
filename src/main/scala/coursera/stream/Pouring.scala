@@ -28,7 +28,7 @@ class Pouring(capacity:Vector[Int]) {
     }
   }
 
-  val glasses:Range = 0 until capacity.length
+  val glasses:Range = capacity.indices
   val moves:IndexedSeq[Move] = (for (glass <- glasses) yield Empty(glass)) ++
     (for (glass <- glasses) yield Fill(glass)) ++
     (for (from <- glasses; to <- glasses if from != to) yield Pour(from, to))
